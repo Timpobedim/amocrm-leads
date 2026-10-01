@@ -1,0 +1,57 @@
+[project]
+name = "amocrm-leads"
+version = "1.0.0"
+description = "Заявки с сайта в amoCRM: FastAPI-приёмник, очередь отправки, OAuth с ротацией токена, лимиты API"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "httpx>=0.27",
+    "pydantic-settings>=2.10",
+    "uvicorn>=0.30",
+    "tzdata>=2024.1; sys_platform == 'win32'",  # в Windows нет системной базы часовых поясов
+]
+
+[project.scripts]
+amo-leads = "amo_leads.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.12",
+    "mypy>=1.17",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/amo_leads"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "C4", "SIM", "PT", "RUF", "ASYNC"]
+# RUF001-003: в русских строках есть кириллица, похожая на латиницу, — это нормально.
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["amo_leads"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
